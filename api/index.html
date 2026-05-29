@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Mi Proyecto Backend</title>
+    <style>
+        body { font-family: Arial; padding: 50px; background: #f4f4f9; text-align: center; }
+        .box { background: white; padding: 20px; border-radius: 10px; box-shadow: 0 0 10px rgba(0,0,0,0.1); display: inline-block;}
+        button { padding: 10px 20px; background: #000; color: #fff; border: none; cursor: pointer; }
+    </style>
+</head>
+<body>
+    <div class="box">
+        <h2>Proyecto Backend - ABP</h2>
+        <p>Prueba de conexión con API y Auth</p>
+        
+        <div id="g_id_onload"
+             data-client_id="TU_CLIENT_ID_DE_GOOGLE"
+             data-context="signin"
+             data-ux_mode="popup"
+             data-callback="handleCredentialResponse"
+             data-auto_prompt="false">
+        </div>
+        <div class="g_id_signin" data-type="standard"></div>
+
+        <br><br>
+        <button onclick="probarBackend()">Probar Conexión al Backend</button>
+        <p id="resultado" style="color: green; font-weight: bold;"></p>
+    </div>
+
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
+    <script>
+        function probarBackend() {
+            fetch('/api')
+                .then(res => res.json())
+                .then(data => {
+                    document.getElementById('resultado').innerText = data.mensaje;
+                });
+        }
+        function handleCredentialResponse(response) {
+            document.getElementById('resultado').innerText = "¡Login con Google Exitoso! Token recibido.";
+        }
+    </script>
+</body>
+</html>
