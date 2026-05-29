@@ -1,44 +1,71 @@
 <!DOCTYPE html>
-<html>
+<html lang="es">
 <head>
+    <meta charset="UTF-8">
     <title>Mi Proyecto Backend</title>
     <style>
-        body { font-family: Arial; padding: 50px; background: #f4f4f9; text-align: center; }
-        .box { background: white; padding: 20px; border-radius: 10px; box-shadow: 0 0 10px rgba(0,0,0,0.1); display: inline-block;}
-        button { padding: 10px 20px; background: #000; color: #fff; border: none; cursor: pointer; }
+        body { font-family: Arial, sans-serif; padding: 50px; background: #f4f4f9; text-align: center; }
+        .box { background: white; padding: 30px; border-radius: 10px; box-shadow: 0 0 10px rgba(0,0,0,0.1); display: inline-block; max-width: 400px;}
+        button { padding: 12px 24px; font-size: 16px; border: none; border-radius: 5px; cursor: pointer; margin-top: 10px; width: 100%; }
+        .btn-backend { background: #000; color: #fff; }
+        .btn-google { background: #4285F4; color: #fff; font-weight: bold; }
+        p { margin-top: 15px; font-weight: bold; }
     </style>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
     <div class="box">
         <h2>Proyecto Backend - ABP</h2>
-        <p>Prueba de conexión con API y Auth</p>
+        <p style="color: #666; font-weight: normal;">Prueba de conexión con API y Auth Real</p>
         
-        <div id="g_id_onload"
-             data-client_id="TU_CLIENT_ID_DE_GOOGLE"
-             data-context="signin"
-             data-ux_mode="popup"
-             data-callback="handleCredentialResponse"
-             data-auto_prompt="false">
-        </div>
-        <div class="g_id_signin" data-type="standard"></div>
+        <button class="btn-google" onclick="loginConGoogle()">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/5/53/Google_%22G%22_Logo.svg" style="width:16px; margin-right:8px; vertical-align:middle;">
+            Iniciar sesión con Google
+        </button>
 
-        <br><br>
-        <button onclick="probarBackend()">Probar Conexión al Backend</button>
-        <p id="resultado" style="color: green; font-weight: bold;"></p>
+        <button class="btn-backend" onclick="probarBackend()">Probar Conexión al Backend</button>
+        <p id="resultado" style="color: green;"></p>
     </div>
 
-    <script src="https://accounts.google.com/gsi/client" async defer></script>
     <script>
+        // CONFIGURACIÓN DE SUPABASE
+        // TODO: Reemplaza estos dos valores con tus credenciales de Supabase
+        const SUPABASE_URL = "TU_SUPABASE_URL"; 
+        const SUPABASE_ANON_KEY = "TU_SUPABASE_ANON_KEY";
+        
+        // Inicializamos el cliente de Supabase
+        const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+        // Función para activar el flujo de Google
+        async function loginConGoogle() {
+            const { error } = await supabaseClient.auth.signInWithOAuth({
+                provider: 'google',
+                options: {
+                    redirectTo: window.location.origin // Al loguearse, vuelve automáticamente a tu web de Vercel
+                }
+            });
+            if (error) document.getElementById('resultado').innerText = "Error: " + error.message;
+        }
+
+        // Función para probar la API básica de Vercel
         function probarBackend() {
             fetch('/api')
                 .then(res => res.json())
                 .then(data => {
                     document.getElementById('resultado').innerText = data.mensaje;
+                    document.getElementById('resultado').style.color = "green";
                 });
         }
-        function handleCredentialResponse(response) {
-            document.getElementById('resultado').innerText = "¡Login con Google Exitoso! Token recibido.";
+
+        // Verificar automáticamente si el usuario viene llegando de iniciar sesión en Google
+        async function comprobarSesion() {
+            const { data: { user } } = await supabaseClient.auth.getUser();
+            if (user) {
+                document.getElementById('resultado').innerText = "¡Login Exitoso! Bienvenido: " + user.email;
+                document.getElementById('resultado').style.color = "blue";
+            }
         }
+        comprobarSesion();
     </script>
 </body>
 </html>
