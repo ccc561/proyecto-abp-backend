@@ -63,6 +63,11 @@
             if (user) {
                 document.getElementById('resultado').innerText = "¡Login Exitoso! Bienvenido: " + user.email;
                 document.getElementById('resultado').style.color = "blue";
+                
+                // NUEVO: Guardar el usuario en nuestra tabla de la base de datos
+                await supabaseClient.from('usuarios').insert([
+                    { email: user.email, nombre: user.user_metadata.full_name || "Usuario de Google" }
+                ]);
             }
         }
         comprobarSesion();
